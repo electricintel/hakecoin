@@ -8,6 +8,7 @@ from datetime import datetime
 
 from hashlib import sha256
 
+from toolz import iterate, take
 
 class Block:
 
@@ -40,16 +41,11 @@ class Block:
 
 
 def main(n=20):
-    blockchain = [Block.create_genesis_block()]
-    previous_block = blockchain[0]
-
-    for i in range(n):
-        block_to_add = previous_block.next()
-        blockchain.append(block_to_add)
-        previous_block = block_to_add
-        print('Block #{} has been added to the blockchain!'.format(
-            blockchain[-1].index))
-        print('Hash: {}\n'.format(blockchain[-1].hash))
+    bc = list(take(n, iterate(lambda b: b.next(),
+                              Block.create_genesis_block())))
+    for i, b in enumerate(bc):
+        print('{0}: {1}'.format(i, b.hash))
+    
 
 if __name__ == '__main__':
     main()
