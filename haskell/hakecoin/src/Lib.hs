@@ -7,6 +7,7 @@ module Lib
 
 import qualified Crypto.Hash.SHA256 as SHA256
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as C
 import Text.Printf (printf)
 import Data.DateTime (DateTime, getCurrentTime, toSqlString)
 
@@ -17,15 +18,27 @@ data Hash = Hash { index :: Int
                  , hash :: String
                  } deriving (Show)
 
+hashBlock :: Hash -> String
+hashBlock hsh = hh where h0 = SHA256.init
+                         cntnt = mconcat [ show $ index hsh
+                                         , toSqlString $ timestamp hsh
+                                         , content hsh
+                                         , previousHash hsh
+                                         ]
+                         packedContent = C.pack cntnt
+                         h1 = SHA256.update h0 packedContent
+                         hh = hexHash h1
+
 makeHash :: Int -> String -> String -> String -> IO Hash
 makeHash n c p h = do
   now <- getCurrentTime
-  return Hash { index=n
-              , timestamp=now
-              , content=c
-              , previousHash=p
-              , hash=h          -- FIXME gdmcbain 20170801
-              }
+  let preHash = Hash { index = n
+                     , timestamp = now
+                     , content = c
+                     , previousHash = p
+                     , hash = "" -- KLUDGE: will be overwritten
+                     }
+  return preHash { hash = hashBlock preHash }
 
 genesisHash :: IO Hash
 genesisHash = makeHash 0 "Genesis Block" "0" "0"
