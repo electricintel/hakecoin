@@ -24,11 +24,26 @@ makeHash n c p h = do
               , timestamp=now
               , content=c
               , previousHash=p
-              , hash=h
+              , hash=h          -- FIXME gdmcbain 20170801
               }
 
 genesisHash :: IO Hash
 genesisHash = makeHash 0 "Genesis Block" "0" "0"
+
+nextHash :: String -> Hash -> IO Hash
+nextHash cntnt hsh = do
+  now <- getCurrentTime
+  let newIndex = 1 + index hsh
+  return Hash { index=newIndex
+              , timestamp=now
+              , content=(if (length cntnt) > 0 then cntnt else
+                         "Hey! I'm block " ++ show newIndex)
+              , previousHash=previousHash hsh
+              , hash=hash hsh   -- FIXME gdmcbain 20170801
+              }
+
+hash1 :: IO Hash
+hash1 = (nextHash "") =<< genesisHash
 
 hashTest = h1 where h = SHA256.init
                     h1 = SHA256.update h "someFunc"
@@ -40,4 +55,4 @@ someFunc0 :: IO ()
 someFunc0 = putStrLn $ hexHash hashTest
 
 someFunc :: IO ()
-someFunc = (show <$> genesisHash) >>= putStrLn
+someFunc = (show <$> hash1) >>= putStrLn
