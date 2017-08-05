@@ -49,14 +49,15 @@ nextHash cntnt hsh = do
   let newIndex = 1 + index hsh
   return Hash { index=newIndex
               , timestamp=now
-              , content=(if (length cntnt) > 0 then cntnt else
-                         "Hey! I'm block " ++ show newIndex)
+              , content=if null cntnt
+                        then "Hey! I'm block " ++ show newIndex
+                        else cntnt
               , previousHash=previousHash hsh
               , hash=hash hsh   -- FIXME gdmcbain 20170801
               }
 
 hash1 :: IO Hash
-hash1 = (nextHash "") =<< genesisHash
+hash1 = nextHash "" =<< genesisHash
 
 hashTest = h1 where h = SHA256.init
                     h1 = SHA256.update h "someFunc"
