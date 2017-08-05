@@ -3,6 +3,8 @@
 module Lib
     ( someFunc
     , Hash
+    , genesisHash
+    , nextHash
     ) where
 
 import qualified Crypto.Hash.SHA256 as SHA256
