@@ -44,12 +44,11 @@ genesisHash :: IO Hash
 genesisHash = makeHash 0 "Genesis Block" "0"
 
 nextHash :: String -> Hash -> IO Hash
-nextHash cntnt hsh = do
-  let newIndex = 1 + index hsh
-      newContent = if null cntnt
-                   then "Hey! I'm block " ++ show newIndex
-                   else cntnt
-  makeHash newIndex newContent (previousHash hsh)
+nextHash cntnt hsh = makeHash newIndex newContent (previousHash hsh) where
+    newIndex = 1 + index hsh
+    newContent = if null cntnt
+                 then "Hey! I'm block " ++ show newIndex
+                 else cntnt
 
 hash1 :: IO Hash
 hash1 = nextHash "" =<< genesisHash
