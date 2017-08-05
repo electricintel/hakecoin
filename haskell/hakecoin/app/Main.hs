@@ -1,9 +1,7 @@
 module Main where
 
-import Control.Monad.Loops (iterateM_)
-
-
 import Lib
+
 main :: IO ()
 main = do
   h0 <- genesisHash
