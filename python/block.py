@@ -5,10 +5,11 @@
 # https://medium.com/crypto-currently/lets-build-the-tiniest-blockchain-e70965a248b
 
 from datetime import datetime
-
 from hashlib import sha256
+from itertools import islice
 
-from toolz import iterate, take
+from toolz import iterate, take, drop
+
 
 class Block:
 
@@ -41,11 +42,13 @@ class Block:
 
 
 def main(n=20):
-    bc = list(take(n, iterate(lambda b: b.next(),
-                              Block.create_genesis_block())))
-    for i, b in enumerate(bc):
-        print('{0}: {1}'.format(i, b.hash))
-    
+
+    for b in islice(iterate(lambda b: b.next(),
+                            Block.create_genesis_block()),
+                    1, n + 1):
+        print('Block #{} has been added to the blockchain!'.format(b.index))
+        print('Hash: {}\n'.format(b.hash))
+
 
 if __name__ == '__main__':
     main()
