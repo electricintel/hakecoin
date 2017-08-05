@@ -45,28 +45,17 @@ genesisHash = makeHash 0 "Genesis Block" "0"
 
 nextHash :: String -> Hash -> IO Hash
 nextHash cntnt hsh = do
-  now <- getCurrentTime
   let newIndex = 1 + index hsh
-  return Hash { index=newIndex
-              , timestamp=now
-              , content=if null cntnt
-                        then "Hey! I'm block " ++ show newIndex
-                        else cntnt
-              , previousHash=previousHash hsh
-              , hash=hash hsh   -- FIXME gdmcbain 20170801
-              }
+      newContent = if null cntnt
+                   then "Hey! I'm block " ++ show newIndex
+                   else cntnt
+  makeHash newIndex newContent (previousHash hsh)
 
 hash1 :: IO Hash
 hash1 = nextHash "" =<< genesisHash
 
-hashTest = h1 where h = SHA256.init
-                    h1 = SHA256.update h "someFunc"
-
 hexHash :: SHA256.Ctx -> String
 hexHash = concatMap (printf "%02x") . B.unpack . SHA256.finalize
-
-someFunc0 :: IO ()
-someFunc0 = putStrLn $ hexHash hashTest
 
 someFunc :: IO ()
 someFunc = (show <$> hash1) >>= putStrLn
