@@ -29,19 +29,19 @@ hashBlock hsh = hh where h0 = SHA256.init
                          h1 = SHA256.update h0 packedContent
                          hh = hexHash h1
 
-makeHash :: Int -> String -> String -> String -> IO Hash
-makeHash n c p h = do
+makeHash :: Int -> String -> String -> IO Hash
+makeHash n cntnt prvsHsh = do
   now <- getCurrentTime
   let preHash = Hash { index = n
                      , timestamp = now
-                     , content = c
-                     , previousHash = p
+                     , content = cntnt
+                     , previousHash = prvsHsh
                      , hash = "" -- KLUDGE: will be overwritten
                      }
   return preHash { hash = hashBlock preHash }
 
 genesisHash :: IO Hash
-genesisHash = makeHash 0 "Genesis Block" "0" "0"
+genesisHash = makeHash 0 "Genesis Block" "0"
 
 nextHash :: String -> Hash -> IO Hash
 nextHash cntnt hsh = do
